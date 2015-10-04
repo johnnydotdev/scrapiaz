@@ -1,5 +1,5 @@
 #!/usr/bin/python
-import filey, urlz
+import filey, urlz, string, song
 from bs4 import BeautifulSoup
 
 test_url = "http://www.azlyrics.com/j/jayz.html"
@@ -21,13 +21,44 @@ def find_songlist_tag(soup):
 
     return songlist_tag
 
+# Input looks like:
+# s:"Young Forever", h:"../lyrics/jayz/youngforever.html", c:"", a:""
+def split_json_elem(json_elem):
+    """
+    Takes in the contents of a json element with curly braces removed.
+    Returns a Song data transfer object (see song.py for details).
+    """
+    properties = json_elem.split("\", ")
+    song_title = properties[0].lstrip("s: \"").rstrip("\"")
+    song_url = properties[1]
+    if song_url.startswith("h:\""):
+        song_url = properties[1][3:]
+    song_url = song_url.rstrip("\"")
+
+    return song.Song(song_title, song_url)
+
+def decode_json(json_string):
+    elems = json_string.lstrip("\r {").rstrip("}").split("}, {")
+    song_list = []
+    for elem in elems:
+        song_list.append(split_json_elem(elem))
+
+    return song_list
+
+def print_song_list(song_list):
+    for song in song_list:
+        print "Song Name: %-*s URL: %s"  % (40, song.song, song.song_url)
+
 def scrape_url(url):
     page = urlz.open_and_read(url)
     soup = BeautifulSoup(page, "lxml")
 
-    songlist_tag = find_songlist_tag(soup)
+    songlist_tag = string.join(find_songlist_tag(soup).split("}];")[0].split("\n")[1:]).strip()
+    json_arg = "{%s}" % (songlist_tag.split("[", 1)[1].rsplit("]", 1)[0].lstrip(" "))
+    song_list = decode_json(json_arg)
 
-    print songlist_tag
+    print_song_list(song_list)
+    #json_value = demjson.decode(json_arg)
 
 #print read_in_urls("urls.txt")
 scrape_url(test_url)
