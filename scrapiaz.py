@@ -38,6 +38,10 @@ def split_json_elem(json_elem):
     return song.Song(song_title, song_url)
 
 def decode_json(json_string):
+    """
+    Removes braces, calls split_json_elem on the contents.
+    Returns a list of parsed Song objects.
+    """
     elems = json_string.lstrip("\r {").rstrip("}").split("}, {")
     song_list = []
     for elem in elems:
@@ -46,10 +50,14 @@ def decode_json(json_string):
     return song_list
 
 def print_song_list(song_list):
+    """Pretty-prints the list of song objects."""
     for song in song_list:
         print "Song Name: %-*s URL: %s"  % (40, song.song, song.song_url)
 
 def scrape_url(url):
+    """
+    Take in a url, opens it, and parses the page for song URLs and names.
+    """
     page = urlz.open_and_read(url)
     soup = BeautifulSoup(page, "lxml")
 
@@ -58,7 +66,6 @@ def scrape_url(url):
     song_list = decode_json(json_arg)
 
     print_song_list(song_list)
-    #json_value = demjson.decode(json_arg)
 
 #print read_in_urls("urls.txt")
 scrape_url(test_url)
