@@ -1,8 +1,10 @@
 #!/usr/bin/python
+import filey
 
-import file_writer
+## File Writer Testing
+filey.make_path("data/experiment/cell")
 
-file_writer.make_path("fuck/my/shit")
-
+# Test list for file_writer.
 hoopla = ["david", "dalpiaz", "is", "my", "advisor"]
-file_writer.write_to_file("fuck/my/shit", "sherry.txt", hoopla)
+
+filey.write_to_file("fuck/my/shit", "sherry.txt", hoopla)

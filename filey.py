@@ -21,3 +21,9 @@ def write_to_file(path, filename, data):
                 file_target.write(line + "\n")
         elif type(data) is str:
             file_target.write(data)
+
+def read_from_file(path, filename):
+    with open(os.path.join(path, filename), "r") as file_source:
+        data = [line.rstrip("\n") for line in file_source]
+
+    return data
