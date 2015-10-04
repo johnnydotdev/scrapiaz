@@ -1,4 +1,5 @@
-# A lyrics scraper for my research project.
+# Scrapiaz
+## A lyrics scraper for my research project.
 #### Contains several modules.
 
 1. FileWriter
