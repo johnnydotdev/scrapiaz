@@ -1,10 +1,6 @@
 #!/usr/bin/python
-import filey
+from scrapiaz import *
 
-## File Writer Testing
-filey.make_path("data/experiment/cell")
-
-# Test list for file_writer.
-hoopla = ["david", "dalpiaz", "is", "my", "advisor"]
-
-filey.write_to_file("fuck/my/shit", "sherry.txt", hoopla)
+artist_urls = read_in_urls("urls.txt")
+for main_url in artist_urls:
+    scrape_artist_for_song_urls(main_url)

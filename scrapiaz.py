@@ -1,6 +1,7 @@
 #!/usr/bin/python
-import filey, urlz, string, song, os, urlparse
+import filey, urlz, string, song, os, urlparse, random
 from bs4 import BeautifulSoup
+from time import sleep
 
 test_url = "http://www.azlyrics.com/j/jayz.html"
 DATA_PATH = "data"
@@ -60,36 +61,51 @@ def get_name_from_url(url):
     return url.split("/")[-1][0:-5]
 
 def get_song_lyrics(parsed_url, url):
-    print "parsed_url: %s\t url:%s" % (parsed_url, url)
     if url.startswith(".."):
         url = urlparse.urljoin(parsed_url.geturl(), url)
+    print "Parsing %s..." % (url)
     page = urlz.open_and_read(url)
     soup = BeautifulSoup(page, "lxml")
     page_text = soup.get_text()
     lyrics = page_text[(page_text.index("Print") + 5):page_text.index("if  ( /Android")].strip("\n")
+    if type(lyrics) == None:
+        print "Nothing returned."
+    elif len(lyrics) > 0:
+        print "Success!"
+    else:
+        print "Lyrics are empty."
     return lyrics
 
 def write_songs(artist, song_list, parsed_url):
-    for song in song_list:
+    length = len(song_list)
+    count = 0
+    selected_indices = []
+    while count < length:
+        sleep(random.triangular(0.8, 2.23, 6.4))
+        rand_int = random.randint(0, 10)
+        if rand_int == 9:
+            sleep(random.triangular(2.6, 10, 7))
+
+        rand_idx = random.randint(0, length - 1)
+        while rand_idx in selected_indices:
+            rand_idx = random.randint(0, length - 1)
+        song = song_list[rand_idx]
+
         song_data = get_song_lyrics(parsed_url, song.url)
+        selected_indices.append(rand_idx)
         filey.write_to_file(os.path.join(DATA_PATH, artist), song.name + SONG_EXT, song_data)
 
 def scrape_artist_for_song_urls(url):
     """
     Take in a url, opens it, and parses the page for song URLs and names.
     """
-    user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
     parsed_url = urlparse.urlparse(url)
-    artist = get_name_from_url(url)
-    page = urlz.open_and_read(url)
-    soup = BeautifulSoup(page, "lxml")
+    artist     = get_name_from_url(url)
+    page       = urlz.open_and_read(url)
+    soup       = BeautifulSoup(page, "lxml")
 
     songlist_tag = string.join(find_songlist_tag(soup).split("}];")[0].split("\n")[1:]).strip()
-    json_arg = "{%s}" % (songlist_tag.split("[", 1)[1].rsplit("]", 1)[0].lstrip(" "))
-    song_list = decode_json(json_arg)
+    json_arg     = "{%s}" % (songlist_tag.split("[", 1)[1].rsplit("]", 1)[0].lstrip(" "))
+    song_list    = decode_json(json_arg)
+
     write_songs(artist, song_list, parsed_url)
-
-    print_song_list(song_list)
-
-#print read_in_urls("urls.txt")
-scrape_artist_for_song_urls(test_url)
