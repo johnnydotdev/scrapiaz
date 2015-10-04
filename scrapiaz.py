@@ -3,6 +3,7 @@ import filey, urlz, string, song
 from bs4 import BeautifulSoup
 
 test_url = "http://www.azlyrics.com/j/jayz.html"
+DATA_PATH = "data"
 
 def read_in_urls(url_filename):
     """Reads in urls from a file of urls, one on each line."""
@@ -52,18 +53,27 @@ def decode_json(json_string):
 def print_song_list(song_list):
     """Pretty-prints the list of song objects."""
     for song in song_list:
-        print "Song Name: %-*s URL: %s"  % (40, song.song, song.song_url)
+        print "Song Name: %-*s URL: %s"  % (40, song.name, song.url)
+
+def get_name_from_url(url):
+    return url.split("/")[-1][0:-5]
+
+def make_song_folder(artist, song_list):
+    for song in song_list:
+        filey.make_path(DATA_PATH + "/" + artist + "/" + song.name)
 
 def scrape_url(url):
     """
     Take in a url, opens it, and parses the page for song URLs and names.
     """
+    artist = get_name_from_url(url)
     page = urlz.open_and_read(url)
     soup = BeautifulSoup(page, "lxml")
 
     songlist_tag = string.join(find_songlist_tag(soup).split("}];")[0].split("\n")[1:]).strip()
     json_arg = "{%s}" % (songlist_tag.split("[", 1)[1].rsplit("]", 1)[0].lstrip(" "))
     song_list = decode_json(json_arg)
+    make_song_folder(artist, song_list)
 
     print_song_list(song_list)
 
