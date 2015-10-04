@@ -19,7 +19,7 @@ def write_to_file(path, filename, data):
         if type(data) is list:
             for line in data:
                 file_target.write(line + "\n")
-        elif type(data) is str:
+        else:
             file_target.write(data)
 
 def read_from_file(path, filename):
