@@ -11,3 +11,5 @@ def open_and_read(url):
         return resp
     except BadStatusLine:
         print "URL %s got owned." % (url)
+    except:
+        print "Skipping %s" % (url)

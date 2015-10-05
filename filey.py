@@ -12,13 +12,20 @@ def make_path(path):
         if exception.errno != errno.EEXIST:
             raise
 
+def already_exists(path, filename):
+    full_path = os.path.join(path, filename)
+    return os.path.exists(full_path)
+
+def scrub_file_name(filename):
+    return "".join(c for c in filename if c in valid_chars).encode('utf-8')
+
 def write_to_file(path, filename, data):
     # Recursively create path passed as arg.
     make_path(path)
-    filename = "".join(c for c in filename if c in valid_chars).encode('utf-8')
-    data     = data.encode('utf-8')
+    data      = data.encode('utf-8')
+    full_path = os.path.join(path, filename)
 
-    with open(os.path.join(path, filename), "wb") as file_target:
+    with open(full_path, "wb") as file_target:
         if type(data) is list:
             for line in data:
                 file_target.write(line + "\n")
